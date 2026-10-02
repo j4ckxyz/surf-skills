@@ -1,0 +1,5 @@
+.env
+.surf-agent/
+__pycache__/
+*.pyc
+.DS_Store
