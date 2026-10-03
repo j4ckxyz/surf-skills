@@ -22,6 +22,9 @@ limits (60/min, 1,000/hour, 10,000/day on the free tier).
 
 Token: SURF_API_TOKEN (or SURF_API_TEST_TOKEN) from the environment, else from
 $SURF_ENV_FILE, ./.env, or ~/.surf-agent/.env. The token is never printed.
+
+SURF_PROXY (same places) sends the requests through the user's own relay, for machines whose address Surf's
+network refuses. See surf_proxy.py and references/proxy.md.
 """
 
 import argparse
@@ -151,8 +154,10 @@ def budget_report():
 # Token, HTTP
 # --------------------------------------------------------------------------
 
-def load_token():
-    for var in TOKEN_VARS:
+def from_env(names):
+    """The first of these variables that is set: in the environment, else in $SURF_ENV_FILE, ./.env or
+    ~/.surf-agent/.env."""
+    for var in names:
         if os.environ.get(var):
             return os.environ[var].strip()
     candidates = [os.environ.get("SURF_ENV_FILE"), ".env", os.path.join(STATE_DIR, ".env")]
@@ -164,11 +169,27 @@ def load_token():
                 line = line.strip()
                 if line.startswith("export "):
                     line = line[7:]
-                for var in TOKEN_VARS:
+                for var in names:
                     if line.startswith(var + "="):
                         value = line.split("=", 1)[1].strip().strip('"').strip("'")
                         if value:
                             return value
+    return None
+
+
+def opener():
+    """Requests go straight to Surf, or through SURF_PROXY (the user's own relay, see references/proxy.md) when
+    Surf's edge refuses this machine's address. Only Surf requests use it."""
+    proxy = from_env(("SURF_PROXY",))
+    if proxy:
+        return urllib.request.build_opener(urllib.request.ProxyHandler({"https": proxy}))
+    return urllib.request.build_opener()
+
+
+def load_token():
+    token = from_env(TOKEN_VARS)
+    if token:
+        return token
     fail("no_token", "No Surf token in this agent's environment. Follow the setup steps in the surf skill: the "
                      "user creates a key at https://developers.surf.social and sets SURF_API_TOKEN in the "
                      "agent's environment (or in ~/.surf-agent/.env).")
@@ -207,7 +228,7 @@ def request(method, path, params=None, body=None, timeout=None, attempts=None, s
         spend_request(path)
         req = urllib.request.Request(url, data=data, method=method, headers=headers)
         try:
-            with urllib.request.urlopen(req, timeout=timeout or TIMEOUT) as resp:
+            with opener().open(req, timeout=timeout or TIMEOUT) as resp:
                 raw, status, hdrs = resp.read(), resp.status, resp.headers
         except urllib.error.HTTPError as err:
             raw, status, hdrs = err.read(), err.code, err.headers
@@ -287,9 +308,9 @@ HINTS = {
     "blocked": "Not a key or permission problem: the key was never checked, so do not ask the user for a new one. "
                "Surf's network refused this machine's connection, which mostly happens to servers and VPSes on "
                "hosting-provider addresses. Retrying the same way will not help. Tell the user and give them the "
-               "request id. Ways forward: send Surf requests through a network the user owns (their home machine "
-               "over Tailscale, say; the script honours HTTPS_PROXY), ask Surf to allow this address, or run you "
-               "from another network.",
+               "request id. Ways forward: send Surf requests through a machine in the user's home (run "
+               "surf_proxy.py there and set SURF_PROXY; see references/proxy.md), ask Surf to allow this address, "
+               "or run you from another network.",
 }
 
 
@@ -757,6 +778,7 @@ def cmd_doctor(args):
     blocked = any(c.get("status") == "blocked" for c in checks)
     emit({"ok": all(c["ok"] for c in checks), "key": kind, "account": name, "checks": checks,
           "what_to_do": HINTS["blocked"] if blocked else None,
+          "through_proxy": True if from_env(("SURF_PROXY",)) else None,
           "feed_creation": switch("SURF_ALLOW_WRITES"), "actions": switch("SURF_ALLOW_ACTIONS"),
           "note": "Write permissions on the key can only be tested by writing, so they are checked the first time "
                   "the user approves a change.",

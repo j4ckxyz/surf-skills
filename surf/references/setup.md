@@ -37,7 +37,7 @@ Run `surf.py doctor`, then `surf.py whoami`.
 - A check failed with `403`: it names the missing permission. Ask them to add it to the key, then run `doctor` again.
 - `no_token` / `401`: the key is not set or not valid. Back to step 2.
 - A check failed with `blocked`: Surf's network (CloudFront) refused this machine's address before the key was looked at. This mostly happens when you run on a server or VPS. The key is fine, so don't ask for another one and don't keep retrying the same way. Tell them plainly, give them the request id from the message, and offer the ways forward:
-  - Send your Surf requests through a network they own, such as their home machine over Tailscale (an exit node, or a proxy there). The script honours the standard `HTTPS_PROXY` variable, so `HTTPS_PROXY=http://<their-node>:<port>` in your environment is enough. Then run `doctor` again.
+  - Send your Surf requests through a machine in their home, such as a Raspberry Pi on their Tailscale network. [proxy.md](proxy.md) has the steps: run `scripts/surf_proxy.py` there, set `SURF_PROXY` here, run `doctor` again.
   - Ask Surf (via https://developers.surf.social) to allow this address.
   - Run you somewhere else, such as their own computer.
 

@@ -118,7 +118,7 @@ Surf allows 60 requests a minute, 1,000 an hour and 10,000 a day on the free tie
 |---|---|
 | `no_token`, `401` | The key is missing or rejected. Run setup. |
 | `403` | The key lacks a permission. Tell the user which scope the message names. |
-| `blocked` | Surf's network refused this machine before the key was checked (common on servers and VPSes). Not a key problem: don't ask for a new key, and don't retry the same way. Tell the user and pass on the request id. You may send Surf requests through a network the user owns instead (see setup step 3). |
+| `blocked` | Surf's network refused this machine before the key was checked (common on servers and VPSes). Not a key problem: don't ask for a new key, and don't retry the same way. Tell the user and pass on the request id. You may send Surf requests through a machine in the user's home instead: [references/proxy.md](references/proxy.md). |
 | `budget`, `429` | See rate limits above. |
 | `thread_unavailable` | Give the post link instead. |
 | timeout | Say which part failed; try once more later, not now. |
