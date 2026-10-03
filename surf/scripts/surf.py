@@ -281,14 +281,15 @@ def emit(payload):
 
 HINTS = {
     401: "Key rejected. Ask the user for a current key; do not retry.",
-    403: "The key lacks a permission. Tell the user which scope is needed; do not work around it.",
+    403: "The key lacks a permission. Tell the user which scope is needed.",
     429: "Rate limited. Make no Surf calls for at least a minute. Say the result is partial if it is.",
-    "budget": "Local safety budget. Do not try to get around it.",
+    "budget": "Local safety budget.",
     "blocked": "Not a key or permission problem: the key was never checked, so do not ask the user for a new one. "
                "Surf's network refused this machine's connection, which mostly happens to servers and VPSes on "
-               "hosting-provider addresses. Stop Surf calls; retrying will not help. Tell the user, give them the "
-               "request id, and suggest they ask Surf to allow this address or run you from another network. Do "
-               "not route around it yourself.",
+               "hosting-provider addresses. Retrying the same way will not help. Tell the user and give them the "
+               "request id. Ways forward: send Surf requests through a network the user owns (their home machine "
+               "over Tailscale, say; the script honours HTTPS_PROXY), ask Surf to allow this address, or run you "
+               "from another network.",
 }
 
 
