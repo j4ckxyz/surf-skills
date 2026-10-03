@@ -70,6 +70,7 @@ If the user's key has these, they work through `api`; nothing in the skills depe
 16. **Single-source feeds ignore `since`.** A person (`bluesky/user/…`, `mastodon/user/…`), YouTube channel or podcast returns its latest posts whatever the window, including ones months old. The script drops posts outside the window; through `api`, check `created_at` yourself.
 17. **Action ids must be full.** A Bluesky post id is the whole `at://…/app.bsky.feed.post/…` URI, not the short code at the end of a bsky.app link. Account ids for follow are DIDs (`did:plc:…`).
 18. **Rate limit headers**: `X-RateLimit-Remaining` counts down per minute and resets after 60 s. AI endpoints have a separate 100-a-day limit.
+19. **A `403` with an HTML body is not a permission error.** Permission errors are JSON and name the scope. An HTML page titled "The request could not be satisfied" comes from CloudFront in front of the API: it refused the caller's address before the key was checked. Seen from a VPS on a hosting provider's address range, while requests from a home connection reached the API. The script reports it as `blocked`.
 
 ## Links that open in Surf
 

@@ -36,6 +36,7 @@ Run `surf.py doctor`, then `surf.py whoami`.
 - All ok: tell them, naming their linked accounts so they can confirm it is them ("You're connected as Alex, with Bluesky alex.bsky.social and Mastodon @alex@mastodon.social.").
 - A check failed with `403`: it names the missing permission. Ask them to add it to the key, then run `doctor` again.
 - `no_token` / `401`: the key is not set or not valid. Back to step 2.
+- A check failed with `blocked`: Surf's network (CloudFront) refused this machine's address before the key was looked at. This mostly happens when you run on a server or VPS. The key is fine, so don't ask for another one and don't keep retrying. Tell them plainly, give them the request id from the message, and offer the two ways forward: ask Surf (via https://developers.surf.social) to allow this address, or run you somewhere else, such as their own computer.
 
 ## 4. Make it theirs (three questions, defaults offered)
 
