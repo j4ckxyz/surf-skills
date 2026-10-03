@@ -36,10 +36,10 @@ Run `surf.py doctor`, then `surf.py whoami`.
 - All ok: tell them, naming their linked accounts so they can confirm it is them ("You're connected as Alex, with Bluesky alex.bsky.social and Mastodon @alex@mastodon.social.").
 - A check failed with `403`: it names the missing permission. Ask them to add it to the key, then run `doctor` again.
 - `no_token` / `401`: the key is not set or not valid. Back to step 2.
-- A check failed with `blocked`: Surf's network (CloudFront) refused this machine's address before the key was looked at. This mostly happens when you run on a server or VPS. The key is fine, so don't ask for another one and don't keep retrying the same way. Tell them plainly, give them the request id from the message, and offer the ways forward:
-  - Send your Surf requests through a machine in their home, such as a Raspberry Pi on their Tailscale network. [proxy.md](proxy.md) has the steps: run `scripts/surf_proxy.py` there, set `SURF_PROXY` here, run `doctor` again.
-  - Ask Surf (via https://developers.surf.social) to allow this address.
-  - Run you somewhere else, such as their own computer.
+- A check failed with `blocked`: Surf's network (CloudFront) refused this machine's address before the key was looked at. This mostly happens when you run on a server or VPS. The key is fine, so don't ask for another one and don't keep retrying the same way. You only get here after trying directly, which is the right order: always try directly first. Then:
+  1. Tell them Surf refused the server you run on, and that you are going to try to get it working through a small relay on a device in their home.
+  2. Ask whether they have a device at home that stays on that you can use for this (a Raspberry Pi or spare computer is plenty), and whether you are allowed to SSH into it over Tailscale. If they don't have Tailscale, recommend it: https://tailscale.com/download.
+  3. Follow [proxy.md](proxy.md): it has the wording, the steps (run `scripts/surf_proxy.py` there, set `SURF_PROXY` here, run `doctor` again) and what to do if they say no.
 
 ## 4. Make it theirs (three questions, defaults offered)
 
